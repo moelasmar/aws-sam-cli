@@ -339,7 +339,7 @@ class InvokeContext:
         samcli.commands.local.cli_common.user_exceptions.DebugContext
             When the debugger_path is not valid
         """
-        if debug_ports and debugger_path:
+        if debugger_path:
             try:
                 debugger = Path(debugger_path).resolve(strict=True)
             except OSError as error:

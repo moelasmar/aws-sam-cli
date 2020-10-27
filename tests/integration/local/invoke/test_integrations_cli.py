@@ -437,6 +437,47 @@ class TestSamPython36HelloWorldIntegration(InvokeIntegBase):
         process_stdout = stdout.strip()
         self.assertEqual(process_stdout.decode("utf-8"), '"git init passed"')
 
+    @pytest.mark.flaky(reruns=3)
+    @pytest.mark.timeout(timeout=TIMEOUT, method="thread")
+    def test_non_exist_debug_path(self):
+        command_list = self.get_command_list(
+            "HelloWorldLambdaFunction",
+            template_path=self.template_path,
+            debugger_path="./some/path",
+        )
+
+        process = Popen(command_list, stderr=PIPE)
+        try:
+            _, stderr = process.communicate(timeout=TIMEOUT)
+        except TimeoutExpired:
+            process.kill()
+            raise
+
+        process_stderr = stderr.strip()
+        self.assertIn("Error: './some/path' could not be found.", process_stderr.decode("utf-8"))
+
+    @pytest.mark.flaky(reruns=3)
+    @pytest.mark.timeout(timeout=TIMEOUT, method="thread")
+    def test_exist_non_dir_debug_path(self):
+        command_list = self.get_command_list(
+            "HelloWorldLambdaFunction",
+            template_path=self.template_path,
+            debugger_path=self.template_path,
+        )
+
+        process = Popen(command_list, stderr=PIPE)
+        try:
+            _, stderr = process.communicate(timeout=TIMEOUT)
+        except TimeoutExpired:
+            process.kill()
+            raise
+
+        process_stderr = stderr.strip()
+        self.assertIn(
+            f"Error: '{self.template_path}' should be a directory with the debugger in it.",
+            process_stderr.decode("utf-8"),
+        )
+
 
 class TestSamInstrinsicsAndPlugins(InvokeIntegBase):
     template = "template-pseudo-params.yaml"

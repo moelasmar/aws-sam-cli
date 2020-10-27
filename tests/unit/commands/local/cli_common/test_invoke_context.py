@@ -584,6 +584,26 @@ class TestInvokeContext_get_debug_context(TestCase):
         with self.assertRaises(DebugContextException):
             InvokeContext._get_debug_context(debug_ports=1111, debug_args=None, debugger_path="somepath")
 
+    @patch("samcli.commands.local.cli_common.invoke_context.Path")
+    def test_debugger_path_not_found_and_no_port(self, pathlib_mock):
+        error = OSError()
+        error.errno = errno.ENOENT
+        pathlib_mock.side_effect = error
+
+        with self.assertRaises(DebugContextException):
+            InvokeContext._get_debug_context(debug_ports=None, debug_args=None, debugger_path="somepath")
+
+    @patch("samcli.commands.local.cli_common.invoke_context.Path")
+    def test_debugger_path_not_dir_and_no_port(self, pathlib_mock):
+        pathlib_path_mock = Mock()
+        resolve_path_mock = Mock()
+        pathlib_path_mock.resolve.return_value = resolve_path_mock
+        resolve_path_mock.is_dir.return_value = False
+        pathlib_mock.return_value = pathlib_path_mock
+
+        with self.assertRaises(DebugContextException):
+            InvokeContext._get_debug_context(debug_ports=None, debug_args=None, debugger_path="somepath")
+
     def test_no_debug_port(self):
         debug_context = InvokeContext._get_debug_context(None, None, None)
 

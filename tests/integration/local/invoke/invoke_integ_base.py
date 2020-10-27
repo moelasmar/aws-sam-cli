@@ -38,6 +38,8 @@ class InvokeIntegBase(TestCase):
         profile=None,
         layer_cache=None,
         docker_network=None,
+        debugger_path=None,
+        debug_port=None,
     ):
         command_list = [self.cmd, "local", "invoke", function_to_invoke]
 
@@ -70,5 +72,11 @@ class InvokeIntegBase(TestCase):
 
         if region:
             command_list = command_list + ["--region", region]
+
+        if debugger_path:
+            command_list = command_list + ["--debugger-path", debugger_path]
+
+        if debug_port:
+            command_list = command_list + ["--debug-port", debug_port]
 
         return command_list

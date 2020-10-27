@@ -96,7 +96,8 @@ def invoke_common_options(f):
                 multiple=True,
             ),
             click.option(
-                "--debugger-path", help="Host path to a debugger that will be mounted into the Lambda container."
+                "--debugger-path",
+                help="Host path to a debugger directory that will be mounted into the Lambda container.",
             ),
             click.option(
                 "--debug-args", help="Additional arguments to be passed to the debugger.", envvar="DEBUGGER_ARGS"
